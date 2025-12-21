@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Mode Switching</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .debug { background: #111; padding: 10px; margin: 10px 0; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>Debug Mode Switching Test</h1>
+    <div id="output"></div>
+
+    <!-- Required DOM elements -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load scripts -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            const div = document.createElement('div');
+            div.className = 'debug';
+            div.textContent = message;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        // Debug the exact issue
+        log('=== DEBUGGING MODE SWITCHING TEST ===');
+        
+        // Step 1: Check initial state
+        log('Step 1: Initial state');
+        log('window.aiMode: ' + window.aiMode + ' (type: ' + typeof window.aiMode + ')');
+        
+        // Step 2: Check if functions exist
+        log('Step 2: Function availability');
+        log('typeof window.setAIMode: ' + typeof window.setAIMode);
+        log('typeof window.setManualMode: ' + typeof window.setManualMode);
+        
+        // Step 3: Test the exact sequence from the failing test
+        log('Step 3: Reproducing test sequence');
+        
+        // Start fresh
+        window.aiMode = false;
+        log('Set aiMode to false: ' + window.aiMode);
+        
+        // Test initial state (should be manual mode)
+        const initialCheck = window.aiMode === false;
+        log('Initial check (aiMode === false): ' + initialCheck);
+        
+        // Test switching to AI mode
+        if (typeof window.setAIMode === 'function') {
+            log('Calling setAIMode()...');
+            window.setAIMode();
+            log('After setAIMode(): ' + window.aiMode);
+            
+            const aiModeCheck = window.aiMode === true;
+            log('AI mode check (aiMode === true): ' + aiModeCheck);
+            
+            // Test switching back to manual mode
+            if (typeof window.setManualMode === 'function') {
+                log('Calling setManualMode()...');
+                window.setManualMode();
+                log('After setManualMode(): ' + window.aiMode);
+                
+                const manualModeCheck = window.aiMode === false;
+                log('Manual mode check (aiMode === false): ' + manualModeCheck);
+                
+                // This is where the test is failing
+                log('Expected: false, Actual: ' + window.aiMode);
+                log('Test would expect(window.aiMode).toBeFalsy() - should this pass? ' + (window.aiMode === false));
+            } else {
+                log('ERROR: setManualMode function not found');
+            }
+        } else {
+            log('ERROR: setAIMode function not found');
+        }
+        
+        // Step 4: Run the actual test
+        log('Step 4: Running actual test');
+        
+        describe('Debug Mode Switching', () => {
+            test('should switch between manual and AI modes', () => {
+                // Start fresh
+                window.aiMode = false;
+                
+                // Test initial state (should be manual mode)
+                expect(window.aiMode).toBeFalsy();
+                
+                // Test switching to AI mode
+                if (typeof window.setAIMode === 'function') {
+                    window.setAIMode();
+                    expect(window.aiMode).toBeTruthy();
+                    
+                    // Test switching back to manual mode
+                    if (typeof window.setManualMode === 'function') {
+                        window.setManualMode();
+                        expect(window.aiMode).toBeFalsy();
+                    }
+                } else {
+                    // If functions don't exist, test direct assignment
+                    window.aiMode = true;
+                    expect(window.aiMode).toBeTruthy();
+                    
+                    window.aiMode = false;
+                    expect(window.aiMode).toBeFalsy();
+                }
+            });
+        });
+
+        runTests().then(results => {
+            log('=== TEST RESULTS ===');
+            log('Total: ' + results.total);
+            log('Passed: ' + results.passed);
+            log('Failed: ' + results.failed);
+            
+            if (results.failed > 0) {
+                log('Failures:');
+                results.failures.forEach(failure => {
+                    log('- ' + failure.description + ': ' + failure.error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run All Tests</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+        .info { color: #0ff; }
+        #output { height: 600px; overflow-y: auto; border: 1px solid #0f0; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Snake Game - Complete Test Suite</h1>
+    <div id="output"></div>
+
+    <!-- Required DOM elements for script.js -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load all scripts in correct order -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+    <script src="tests/unit-tests.js"></script>
+    <script src="tests/property-tests.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        // Override console.log to display in output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog(...args);
+            const div = document.createElement('div');
+            const message = args.join(' ');
+            
+            if (message.includes('✅')) {
+                div.className = 'pass';
+            } else if (message.includes('❌')) {
+                div.className = 'fail';
+            } else if (message.includes('📊') || message.includes('🧪')) {
+                div.className = 'info';
+            }
+            
+            div.textContent = message;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        };
+
+        // Run tests when page loads
+        window.addEventListener('load', async () => {
+            console.log('🧪 Starting complete test suite...\n');
+            
+            try {
+                const results = await runTests();
+                
+                console.log('\n=== FINAL SUMMARY ===');
+                if (results.failed === 0) {
+                    console.log('🎉 ALL TESTS PASSED!');
+                } else {
+                    console.log('⚠️  Some tests failed. See details above.');
+                }
+            } catch (error) {
+                console.log('❌ Test execution failed: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Fix Verification</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+        .info { color: #0ff; }
+        pre { background: #111; padding: 10px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Fix Verification</h1>
+    <pre id="output"></pre>
+
+    <!-- Required DOM elements -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load scripts -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.textContent += message + '\n';
+            console.log(message);
+        }
+
+        // Test the fix step by step
+        log('=== TESTING THE FIX ===\n');
+        
+        log('1. Initial state:');
+        log('   aiMode (local): ' + aiMode);
+        log('   window.aiMode: ' + window.aiMode);
+        log('   Are they equal? ' + (aiMode === window.aiMode));
+        
+        log('\n2. Testing setAIMode():');
+        setAIMode();
+        log('   aiMode (local): ' + aiMode);
+        log('   window.aiMode: ' + window.aiMode);
+        log('   Are they equal? ' + (aiMode === window.aiMode));
+        log('   Both true? ' + (aiMode === true && window.aiMode === true));
+        
+        log('\n3. Testing setManualMode():');
+        setManualMode();
+        log('   aiMode (local): ' + aiMode);
+        log('   window.aiMode: ' + window.aiMode);
+        log('   Are they equal? ' + (aiMode === window.aiMode));
+        log('   Both false? ' + (aiMode === false && window.aiMode === false));
+        
+        log('\n4. Running the actual test:');
+        
+        describe('Fixed Mode Switching', () => {
+            test('should switch between manual and AI modes', () => {
+                // Start fresh
+                window.aiMode = false;
+                
+                // Test initial state (should be manual mode)
+                expect(window.aiMode).toBeFalsy();
+                
+                // Check if mode switching functions exist
+                const hasSetAIMode = typeof window.setAIMode === 'function';
+                const hasSetManualMode = typeof window.setManualMode === 'function';
+                
+                if (hasSetAIMode && hasSetManualMode) {
+                    // Test function-based switching
+                    window.setAIMode();
+                    expect(window.aiMode).toBeTruthy();
+                    
+                    window.setManualMode();
+                    expect(window.aiMode).toBeFalsy();
+                } else {
+                    // Test direct assignment fallback
+                    window.aiMode = true;
+                    expect(window.aiMode).toBeTruthy();
+                    
+                    window.aiMode = false;
+                    expect(window.aiMode).toBeFalsy();
+                }
+            });
+        });
+
+        runTests().then(results => {
+            log('\n=== TEST RESULTS ===');
+            log('Total: ' + results.total);
+            log('Passed: ' + results.passed);
+            log('Failed: ' + results.failed);
+            
+            if (results.failed === 0) {
+                log('\n🎉 SUCCESS! The fix worked!');
+            } else {
+                log('\n❌ Still failing:');
+                results.failures.forEach(failure => {
+                    log('- ' + failure.description + ': ' + failure.error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

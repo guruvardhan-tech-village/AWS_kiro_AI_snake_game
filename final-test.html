@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Test - Snake Game</title>
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            padding: 20px; 
+            background: #000; 
+            color: #0f0; 
+            line-height: 1.4;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+        .info { color: #0ff; }
+        .summary { color: #ff0; font-weight: bold; }
+        #output { 
+            height: 500px; 
+            overflow-y: auto; 
+            border: 2px solid #0f0; 
+            padding: 15px; 
+            background: #111;
+            white-space: pre-wrap;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #333;
+            background: #111;
+        }
+        .stat { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 12px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 Snake Game - Final Test Suite</h1>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="total-tests">0</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value pass" id="passed-tests">0</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value fail" id="failed-tests">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value info" id="success-rate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+
+        <div id="output">Loading test suite...</div>
+    </div>
+
+    <!-- Required DOM elements for script.js -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load all scripts in correct order -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+    <script src="tests/unit-tests.js"></script>
+    <script src="tests/property-tests.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        const totalEl = document.getElementById('total-tests');
+        const passedEl = document.getElementById('passed-tests');
+        const failedEl = document.getElementById('failed-tests');
+        const rateEl = document.getElementById('success-rate');
+        
+        // Override console.log to display in output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog(...args);
+            const message = args.join(' ');
+            
+            // Update output
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+        };
+
+        // Run tests when page loads
+        window.addEventListener('load', async () => {
+            console.log('🧪 Starting Snake Game Test Suite');
+            console.log('=====================================\n');
+            
+            console.log('📋 Test Configuration:');
+            console.log('- Framework: Custom browser-based (Jest-like API)');
+            console.log('- Property Testing: Custom implementation (fast-check-like API)');
+            console.log('- Property Test Iterations: 100 per test');
+            console.log('- Environment: Browser-based execution\n');
+            
+            try {
+                const results = await runTests();
+                
+                // Update stats
+                totalEl.textContent = results.total;
+                passedEl.textContent = results.passed;
+                failedEl.textContent = results.failed;
+                const successRate = results.total > 0 ? Math.round((results.passed / results.total) * 100) : 0;
+                rateEl.textContent = successRate + '%';
+                
+                console.log('\n🎯 FINAL RESULTS');
+                console.log('================');
+                
+                if (results.failed === 0) {
+                    console.log('🎉 ALL TESTS PASSED!');
+                    console.log('✅ Snake game implementation is fully tested and working correctly.');
+                } else {
+                    console.log('⚠️  ' + results.failed + ' test(s) still failing:');
+                    results.failures.forEach((failure, index) => {
+                        console.log(`${index + 1}. ${failure.description}`);
+                        console.log(`   Error: ${failure.error}\n`);
+                    });
+                }
+                
+                console.log(`📊 Success Rate: ${successRate}% (${results.passed}/${results.total})`);
+                
+                if (results.failed > 0) {
+                    console.log('\n🔧 Next Steps:');
+                    console.log('- Review failing test details above');
+                    console.log('- Fix implementation or test logic as needed');
+                    console.log('- Re-run tests to verify fixes');
+                }
+                
+            } catch (error) {
+                console.log('❌ Test execution failed: ' + error.message);
+                console.log('Stack trace: ' + error.stack);
+            }
+        });
+    </script>
+</body>
+</html>

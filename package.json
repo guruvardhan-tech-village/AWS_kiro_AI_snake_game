@@ -1,0 +1,17 @@
+{
+  "name": "snake-game",
+  "version": "1.0.0",
+  "description": "Browser-based Snake game with AI and manual control modes",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Tests run in browser - open test.html\"",
+    "test:unit": "echo \"Unit tests - open test.html\"",
+    "test:property": "echo \"Property-based tests - open test.html\""
+  },
+  "keywords": ["snake", "game", "ai", "canvas", "javascript"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "fast-check": "^3.15.0"
+  }
+}

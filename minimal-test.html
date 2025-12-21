@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        pre { background: #111; padding: 10px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Test Runner</h1>
+    <pre id="output"></pre>
+
+    <!-- Required DOM elements -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load scripts -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.textContent += message + '\n';
+            console.log(message);
+        }
+
+        // Test the specific failing tests
+        log('=== TESTING SPECIFIC FAILURES ===\n');
+
+        // Test 1: Mode switching (the failing unit test)
+        log('Test 1: Mode Switching');
+        try {
+            window.aiMode = false;
+            log('Initial aiMode: ' + window.aiMode);
+            
+            if (typeof window.setAIMode === 'function') {
+                window.setAIMode();
+                log('After setAIMode(): ' + window.aiMode);
+                
+                if (typeof window.setManualMode === 'function') {
+                    window.setManualMode();
+                    log('After setManualMode(): ' + window.aiMode);
+                    
+                    // This is the test that was failing
+                    const testResult = window.aiMode === false;
+                    log('Test result (should be true): ' + testResult);
+                } else {
+                    log('ERROR: setManualMode function not found');
+                }
+            } else {
+                log('ERROR: setAIMode function not found');
+            }
+        } catch (e) {
+            log('ERROR: ' + e.message);
+        }
+
+        log('\nTest 2: Property Test with Array Syntax');
+        try {
+            const property = fc.property(
+                [fc.position(), fc.direction()],
+                (startPos, direction) => {
+                    return startPos.x >= 0 && startPos.x < 20;
+                }
+            );
+            
+            const result = fc.assert(property, 5);
+            log('Property test passed: ' + result.success);
+        } catch (e) {
+            log('Property test failed: ' + e.message);
+        }
+
+        log('\nTest 3: Simple Unit Test');
+        describe('Mode Switching Test', () => {
+            test('should switch between manual and AI modes', () => {
+                window.aiMode = false;
+                expect(window.aiMode).toBeFalsy();
+                
+                if (typeof window.setAIMode === 'function') {
+                    window.setAIMode();
+                    expect(window.aiMode).toBeTruthy();
+                    
+                    if (typeof window.setManualMode === 'function') {
+                        window.setManualMode();
+                        expect(window.aiMode).toBeFalsy();
+                    }
+                }
+            });
+        });
+
+        runTests().then(results => {
+            log('\n=== RESULTS ===');
+            log('Total: ' + results.total);
+            log('Passed: ' + results.passed);
+            log('Failed: ' + results.failed);
+            
+            if (results.failed > 0) {
+                log('\nFailures:');
+                results.failures.forEach(failure => {
+                    log('- ' + failure.description + ': ' + failure.error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

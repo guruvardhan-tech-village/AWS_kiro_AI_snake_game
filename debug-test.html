@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <canvas id="game" width="400" height="400"></canvas>
+    <div id="score">0</div>
+    <button id="aiBtn">AI</button>
+    <button id="manualBtn">Manual</button>
+
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        console.log('=== DEBUG INFO ===');
+        console.log('aiMode:', window.aiMode);
+        console.log('setAIMode function:', typeof window.setAIMode);
+        console.log('setManualMode function:', typeof window.setManualMode);
+        
+        // Test the mode switching
+        console.log('\n=== TESTING MODE SWITCHING ===');
+        console.log('Initial aiMode:', window.aiMode);
+        
+        if (typeof window.setAIMode === 'function') {
+            window.setAIMode();
+            console.log('After setAIMode():', window.aiMode);
+            
+            if (typeof window.setManualMode === 'function') {
+                window.setManualMode();
+                console.log('After setManualMode():', window.aiMode);
+            }
+        }
+        
+        // Run a simple test
+        console.log('\n=== RUNNING SIMPLE TEST ===');
+        
+        describe('Debug Test', () => {
+            test('should switch modes correctly', () => {
+                window.aiMode = false;
+                expect(window.aiMode).toBeFalsy();
+                
+                window.setAIMode();
+                expect(window.aiMode).toBeTruthy();
+                
+                window.setManualMode();
+                expect(window.aiMode).toBeFalsy();
+            });
+        });
+        
+        runTests().then(results => {
+            console.log('Test results:', results);
+        });
+    </script>
+</body>
+</html>

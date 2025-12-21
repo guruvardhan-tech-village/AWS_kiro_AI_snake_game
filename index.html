@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Retro Snake AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>🐍 AI Snake</h1>
+
+  <!-- Score Board -->
+  <div id="scoreBoard">
+    Score: <span id="score">0</span>
+  </div>
+
+  <canvas id="game" width="400" height="400"></canvas>
+<br>
+  <!-- Mode Control Buttons -->
+  <div class="mode-buttons">
+    <button id="aiBtn" onclick="setAIMode()">🤖 AI MODE</button>
+    <button id="manualBtn" onclick="setManualMode()">🎮 MANUAL MODE</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

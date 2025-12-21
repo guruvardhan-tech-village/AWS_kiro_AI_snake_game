@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Test Fix</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+        .info { color: #0ff; }
+    </style>
+</head>
+<body>
+    <h1>Quick Test - Mode Switching Fix</h1>
+    <pre id="output"></pre>
+
+    <!-- Required DOM elements -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="aiBtn" style="display: none;">AI</button>
+    <button id="manualBtn" style="display: none;">Manual</button>
+
+    <!-- Load scripts -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    <script src="script.js"></script>
+    <script src="tests/unit-tests.js"></script>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        // Override console.log to display in output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog(...args);
+            const message = args.join(' ');
+            
+            output.textContent += message + '\n';
+            output.scrollTop = output.scrollHeight;
+        };
+
+        // Run only the mode switching tests
+        window.addEventListener('load', async () => {
+            console.log('🧪 Testing Mode Switching Fix...\n');
+            
+            // Filter tests to only run mode switching tests
+            const originalTests = testFramework.tests;
+            testFramework.tests = originalTests.filter(test => 
+                test.description.includes('Mode Switching')
+            );
+            
+            try {
+                const results = await runTests();
+                
+                console.log('\n=== RESULTS ===');
+                if (results.failed === 0) {
+                    console.log('🎉 ALL MODE SWITCHING TESTS PASSED!');
+                } else {
+                    console.log('⚠️  Still have failures:');
+                    results.failures.forEach(failure => {
+                        console.log('- ' + failure.description + ': ' + failure.error);
+                    });
+                }
+                
+                console.log(`📊 Success Rate: ${Math.round((results.passed / results.total) * 100)}% (${results.passed}/${results.total})`);
+                
+            } catch (error) {
+                console.log('❌ Test execution failed: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

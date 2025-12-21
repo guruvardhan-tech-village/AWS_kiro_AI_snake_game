@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game - Test Runner</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+        
+        .test-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background-color: #333;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 5px;
+        }
+        
+        button:hover {
+            background-color: #00ff00;
+            color: #1a1a1a;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #test-output {
+            background-color: #000;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+        
+        .test-section h3 {
+            color: #00ff00;
+            margin-top: 0;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .status.success {
+            background-color: #004400;
+            border: 1px solid #00ff00;
+        }
+        
+        .status.error {
+            background-color: #440000;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .status.info {
+            background-color: #004444;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 Snake Game Test Runner</h1>
+        
+        <!-- Hidden canvas for testing -->
+        <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+        <div id="score" style="display: none;">0</div>
+        <button id="aiBtn" style="display: none;">AI</button>
+        <button id="manualBtn" style="display: none;">Manual</button>
+        
+        <div class="test-controls">
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="runUnitTests()">Run Unit Tests</button>
+            <button onclick="runPropertyTests()">Run Property Tests</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Test Status</h3>
+            <div id="test-status" class="status info">
+                Ready to run tests. Click a button above to start.
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 Test Output</h3>
+            <div id="test-output">
+Welcome to Snake Game Test Runner!
+
+This test runner provides:
+✅ Unit testing framework (Jest-like API)
+✅ Property-based testing (fast-check-like API)  
+✅ Game state utilities and generators
+✅ Browser-based test execution
+
+Available test types:
+- Unit Tests: Specific examples and edge cases
+- Property Tests: Universal properties across random inputs
+
+Click "Run All Tests" to execute the complete test suite.
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔧 Testing Infrastructure</h3>
+            <p><strong>Framework:</strong> Custom browser-based testing (Jest/Vitest-like API)</p>
+            <p><strong>Property Testing:</strong> Custom implementation (fast-check-like API)</p>
+            <p><strong>Test Utilities:</strong> Game state generators and helpers</p>
+            <p><strong>Configuration:</strong> 100+ iterations per property test</p>
+        </div>
+    </div>
+
+    <!-- Load testing infrastructure -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+    
+    <!-- Initialize game variables and DOM elements before loading game code -->
+    <script>
+        // Ensure game variables are initialized before any other scripts
+        if (typeof testUtils !== 'undefined') {
+            testUtils.initializeGameVariables();
+        }
+        
+        // Ensure DOM elements exist for script.js
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make sure canvas exists and has proper dimensions
+            const canvas = document.getElementById('game');
+            if (canvas) {
+                canvas.width = 400;
+                canvas.height = 400;
+            }
+        });
+    </script>
+    
+    <!-- Load game code (when available) -->
+    <script src="script.js"></script>
+    
+    <!-- Test runner logic -->
+    <script>
+        let testOutput = document.getElementById('test-output');
+        let testStatus = document.getElementById('test-status');
+        
+        // Override console.log to display in test output
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            testOutput.textContent += args.join(' ') + '\n';
+            testOutput.scrollTop = testOutput.scrollHeight;
+        };
+        
+        function updateStatus(message, type = 'info') {
+            testStatus.textContent = message;
+            testStatus.className = `status ${type}`;
+        }
+        
+        function clearOutput() {
+            testOutput.textContent = '';
+            updateStatus('Output cleared. Ready to run tests.', 'info');
+        }
+        
+        async function runAllTests() {
+            clearOutput();
+            updateStatus('Running all tests...', 'info');
+            
+            try {
+                console.log('🧪 Starting complete test suite...\n');
+                
+                // Load test files if they exist
+                await loadTestFiles();
+                
+                const results = await runTests();
+                
+                if (results.failed === 0) {
+                    updateStatus(`✅ All tests passed! (${results.passed}/${results.total})`, 'success');
+                } else {
+                    updateStatus(`❌ ${results.failed} test(s) failed (${results.passed}/${results.total} passed)`, 'error');
+                }
+            } catch (error) {
+                console.log(`❌ Test execution failed: ${error.message}`);
+                updateStatus('Test execution failed', 'error');
+            }
+        }
+        
+        async function runUnitTests() {
+            clearOutput();
+            updateStatus('Running unit tests...', 'info');
+            console.log('🧪 Running unit tests only...\n');
+            
+            // This will be implemented when unit test files are created
+            console.log('ℹ️  Unit test files not yet created. Run task 2+ to implement tests.');
+            updateStatus('Unit tests not yet implemented', 'info');
+        }
+        
+        async function runPropertyTests() {
+            clearOutput();
+            updateStatus('Running property-based tests...', 'info');
+            console.log('🧪 Running property-based tests only...\n');
+            
+            // This will be implemented when property test files are created
+            console.log('ℹ️  Property test files not yet created. Run task 3+ to implement tests.');
+            updateStatus('Property tests not yet implemented', 'info');
+        }
+        
+        async function loadTestFiles() {
+            // This function will dynamically load test files as they are created
+            console.log('📁 Loading test files...');
+            
+            // Ensure game variables are initialized before loading tests
+            if (typeof testUtils !== 'undefined') {
+                testUtils.initializeGameVariables();
+            }
+            
+            const testFiles = [
+                'tests/unit-tests.js',
+                'tests/property-tests.js'
+            ];
+            
+            for (const file of testFiles) {
+                try {
+                    await loadScript(file);
+                    console.log(`✅ Loaded ${file}`);
+                } catch (error) {
+                    console.log(`ℹ️  ${file} not found (will be created in future tasks)`);
+                }
+            }
+        }
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        // Initialize test runner
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize game variables before running any tests
+            if (typeof testUtils !== 'undefined') {
+                testUtils.initializeGameVariables();
+            }
+            
+            console.log('🚀 Test runner initialized');
+            console.log('📋 Testing infrastructure ready');
+            console.log('');
+            console.log('Available globals:');
+            console.log('- describe, test, it, expect (unit testing)');
+            console.log('- fc (property-based testing generators)');
+            console.log('- testUtils (game state utilities)');
+            console.log('');
+            updateStatus('Test runner ready', 'success');
+        });
+    </script>
+</body>
+</html>

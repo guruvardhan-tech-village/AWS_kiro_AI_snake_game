@@ -1,0 +1,56 @@
+body {
+  background: black;
+  color: lime;
+  text-align: center;
+  font-family: monospace;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+#scoreBoard {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+canvas {
+  background: #111;
+  border: 3px solid lime;
+  margin-top: 10px;
+}
+
+/* Mode Control Buttons */
+.mode-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#aiBtn, #manualBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: monospace;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#aiBtn.ai-on, #manualBtn.ai-on {
+  background: lime;
+  color: black;
+  box-shadow: 0 0 10px lime;
+}
+
+#aiBtn.ai-off, #manualBtn.ai-off {
+  background: #333;
+  color: #888;
+  border: 1px solid #555;
+}
+
+#aiBtn.ai-off:hover, #manualBtn.ai-off:hover {
+  background: #444;
+  color: #aaa;
+}

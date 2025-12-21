@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake Game Test Runner</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .summary { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Snake Game Test Runner</h1>
+    <div id="output"></div>
+
+    <!-- Load game dependencies -->
+    <canvas id="game" width="400" height="400" style="display: none;"></canvas>
+    <div id="score" style="display: none;">0</div>
+    <button id="ai-btn" style="display: none;">AI Mode</button>
+    <button id="manual-btn" style="display: none;">Manual Mode</button>
+
+    <!-- Load test framework and utilities -->
+    <script src="test-framework.js"></script>
+    <script src="property-testing.js"></script>
+    <script src="test-utils.js"></script>
+
+    <!-- Load game script -->
+    <script src="script.js"></script>
+
+    <!-- Load test files -->
+    <script src="tests/unit-tests.js"></script>
+    <script src="tests/property-tests.js"></script>
+
+    <script>
+        // Override console.log to capture output
+        const output = document.getElementById('output');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            const message = args.join(' ');
+            const div = document.createElement('div');
+            
+            if (message.includes('✅')) {
+                div.className = 'pass';
+            } else if (message.includes('❌')) {
+                div.className = 'fail';
+            } else if (message.includes('📊')) {
+                div.className = 'summary';
+            }
+            
+            div.textContent = message;
+            output.appendChild(div);
+            originalLog(...args);
+        };
+
+        // Run tests when page loads
+        window.addEventListener('load', async () => {
+            console.log('Starting test suite...');
+            await runTests();
+        });
+    </script>
+</body>
+</html>
