@@ -8,6 +8,17 @@
 [![AI Powered](https://img.shields.io/badge/AI-Powered-blue.svg)](#ai-controller)
 [![Spec Driven](https://img.shields.io/badge/Development-Spec%20Driven-purple.svg)](#spec-driven-development)
 
+## 🎮 Live Demo
+ 
+ <iframe
+  src="https://guruvardhan-tech-village.github.io/AWS_kiro_AI_snake_game/"
+  width="600"
+  height="400"
+  title="Snake Game Live Preview"
+  frameborder="0"
+  allowfullscreen
+></iframe>
+
 **A professionally developed Snake Game featuring intelligent AI controller, comprehensive testing suite, and modern development practices**
 
 [🎮 **Play Game**](index.html) • [🧪 **Run Tests**](final-test.html) • [📋 **View Specs**](.kiro/specs/snake-game/) • [📖 **Documentation**](TESTING.md)
